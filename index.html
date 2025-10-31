@@ -1,0 +1,494 @@
+import React, { useState, useMemo } from "react";
+import { ChevronRight, Check, TrendingUp, Search, Rocket, Sparkles, X } from "lucide-react";
+
+const PLANS = [
+  {
+    id: "estudio",
+    stage: "Explorar",
+    icon: Search,
+    title: "Estudio de mercado",
+    description:
+      "Analizamos el mercado europeo, mapeamos competidores y detectamos oportunidades de entrada.",
+    priceFrom: 1200,
+    bullets: [
+      "Benchmark de precios y atributos",
+      "Tamaño de mercado y rentabilidad",
+      "Estrategia de posicionamiento y PVP",
+      "Estructura de costes y márgenes",
+    ],
+    ideal: "Marcas evaluando entrar o validar potencial en Amazon.",
+    color: "cyan",
+    badge: "Descubrimiento",
+  },
+  {
+    id: "auditoria",
+    stage: "Optimizar",
+    icon: TrendingUp,
+    title: "Auditoría inicial",
+    description:
+      "Evaluamos tu cuenta y catálogo; proponemos roadmap de crecimiento a 90 días.",
+    priceFrom: 900,
+    bullets: [
+      "Análisis de cuenta y catálogo",
+      "Oportunidades de mejora y quick wins",
+      "Definición de estrategia y roadmap",
+      "Validación de marca y Brand Registry",
+    ],
+    ideal: "Cuentas activas que necesitan foco y priorización.",
+    color: "green",
+    badge: "Mejora",
+  },
+  {
+    id: "gestion",
+    stage: "Escalar",
+    icon: Rocket,
+    title: "Gestión mensual",
+    description:
+      "Operación integral de la cuenta: listings, A+, Brand Store, campañas y reporting.",
+    priceFrom: 900,
+    bullets: [
+      "PPC & reporting mensual",
+      "Optimización continua de listings",
+      "Gestión de stock y campañas",
+      "Soporte creativo (imágenes, A+, Store)",
+    ],
+    note:
+      "Nuestros clientes suelen invertir entre 900 € y 2.500 €/mes según objetivos y mercados.",
+    ideal: "Marcas listas para crecer de forma sostenida en Europa.",
+    commission: [
+      { label: "≤ 20.000 €/mes", pct: 0.1 },
+      { label: "20.001–40.000 €/mes", pct: 0.08 },
+      { label: "> 40.000 €/mes", pct: 0.06 },
+    ],
+    color: "orange",
+    badge: "Crecimiento",
+  },
+];
+
+const EXTRA = {
+  title: "Servicios adicionales",
+  items: [
+    { name: "Brand Store", from: 400 },
+    { name: "Videos de producto con IA", from: 250 },
+    { name: "Creatividades A+", from: 180 },
+  ],
+};
+
+export default function AgloobPricing() {
+  const stages = ["Explorar", "Optimizar", "Escalar"] as const;
+  const [stage, setStage] = useState<(typeof stages)[number]>("Explorar");
+  const [showLeadForm, setShowLeadForm] = useState(false);
+  const [leadIntent, setLeadIntent] = useState<string | null>(null);
+  const [hoveredPlan, setHoveredPlan] = useState<string | null>(null);
+
+  const filtered = useMemo(
+    () => PLANS.filter((p) => p.stage === stage),
+    [stage]
+  );
+
+  const currentStageIndex = stages.indexOf(stage);
+
+  function openForm(intent: string) {
+    setLeadIntent(intent);
+    setShowLeadForm(true);
+  }
+
+  const getColorClasses = (color: string, isActive: boolean = false) => {
+    const colors = {
+      cyan: {
+        active: "bg-blue-500",
+        hover: "hover:bg-blue-600",
+        text: "text-blue-500",
+        border: "border-blue-500",
+        light: "bg-blue-50",
+      },
+      green: {
+        active: "bg-green-500",
+        hover: "hover:bg-green-600",
+        text: "text-green-500",
+        border: "border-green-500",
+        light: "bg-green-50",
+      },
+      orange: {
+        active: "bg-orange-500",
+        hover: "hover:bg-orange-600",
+        text: "text-orange-500",
+        border: "border-orange-500",
+        light: "bg-orange-50",
+      },
+    };
+    return colors[color as keyof typeof colors];
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header */}
+      <div className="relative overflow-hidden bg-gray-50">
+        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 tracking-tight">
+              Planes y servicios Amazon
+            </h1>
+            <p className="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto mb-2">
+              Claridad total en cada etapa
+            </p>
+            <p className="text-base text-gray-500 max-w-3xl mx-auto">
+              Acompañamos a tu marca desde el estudio de mercado hasta la gestión continua, con una propuesta estratégica ganadora y modelo basado en resultados.
+            </p>
+          </div>
+
+          {/* Interactive stage selector with flow */}
+          <div className="mt-12 mb-8">
+            <p className="text-center text-sm text-gray-500 mb-6 font-medium">
+              ¿En qué etapa está tu marca en Amazon?
+            </p>
+            <div className="flex items-center justify-center gap-3 md:gap-6 flex-wrap max-w-4xl mx-auto">
+              {stages.map((s, idx) => {
+                const isActive = s === stage;
+                const plan = PLANS.find((p) => p.stage === s);
+                const Icon = plan?.icon || Search;
+                const colors = getColorClasses(plan?.color || "cyan");
+                
+                return (
+                  <React.Fragment key={s}>
+                    <button
+                      onClick={() => setStage(s)}
+                      className={`group relative px-6 md:px-10 py-5 rounded-2xl transition-all duration-300 border-2 ${
+                        isActive
+                          ? `${colors.active} border-transparent text-white shadow-lg transform scale-105`
+                          : "bg-white border-gray-200 hover:border-gray-300 text-gray-700"
+                      }`}
+                    >
+                      <div className="flex flex-col items-center gap-2">
+                        <div className={`p-2 rounded-xl ${
+                          isActive ? "bg-white bg-opacity-20" : "bg-gray-100"
+                        }`}>
+                          <Icon className={`w-5 h-5 md:w-6 md:h-6 ${
+                            isActive ? "text-white" : "text-gray-600"
+                          }`} />
+                        </div>
+                        <span className={`text-sm md:text-base font-semibold`}>
+                          {s}
+                        </span>
+                        {plan && (
+                          <span className={`text-xs ${
+                            isActive ? "text-white opacity-90" : "text-gray-500"
+                          }`}>
+                            {plan.badge}
+                          </span>
+                        )}
+                      </div>
+                    </button>
+                    
+                    {idx < stages.length - 1 && (
+                      <ChevronRight className={`w-5 h-5 ${
+                        idx < currentStageIndex ? "text-blue-500" : "text-gray-300"
+                      } transition-colors hidden md:block`} />
+                    )}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Cards section */}
+      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
+          {filtered.map((plan) => {
+            const Icon = plan.icon;
+            const colors = getColorClasses(plan.color);
+            
+            return (
+              <div
+                key={plan.id}
+                onMouseEnter={() => setHoveredPlan(plan.id)}
+                onMouseLeave={() => setHoveredPlan(null)}
+                className={`relative rounded-2xl bg-white border-2 p-8 transition-all duration-300 ${
+                  hoveredPlan === plan.id
+                    ? `${colors.border} shadow-xl transform scale-105`
+                    : "border-gray-200 hover:border-gray-300 shadow-sm"
+                }`}
+              >
+                <div className="relative">
+                  {/* Header */}
+                  <div className="flex items-start justify-between mb-5">
+                    <div className={`p-3 rounded-xl ${colors.active}`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${colors.light} ${colors.text}`}>
+                      {plan.badge}
+                    </span>
+                  </div>
+
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.title}</h3>
+                  <p className="text-sm text-gray-600 mb-6">{plan.description}</p>
+
+                  {/* Price */}
+                  <div className="mb-6">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-sm text-gray-500">desde</span>
+                      <span className="text-3xl font-bold text-gray-900">
+                        {plan.priceFrom.toLocaleString("es-ES")} €
+                      </span>
+                    </div>
+                    {plan.note && (
+                      <p className="text-xs text-gray-500 mt-2">{plan.note}</p>
+                    )}
+                  </div>
+
+                  {/* Bullets */}
+                  <ul className="space-y-3 mb-6">
+                    {plan.bullets.map((bullet, i) => (
+                      <li key={i} className="flex items-start gap-3">
+                        <div className={`mt-1 p-1 rounded-full ${colors.active} flex-shrink-0`}>
+                          <Check className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-700">{bullet}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  {/* Ideal para */}
+                  <div className={`mb-6 p-4 rounded-xl ${colors.light} border ${colors.border} border-opacity-30`}>
+                    <p className="text-xs text-gray-600 mb-1 font-medium">🎯 Ideal para:</p>
+                    <p className="text-sm text-gray-800">{plan.ideal}</p>
+                  </div>
+
+                  {/* CTAs */}
+                  <div className="space-y-3 mb-6">
+                    <button
+                      onClick={() => openForm(`Propuesta personalizada – ${plan.title}`)}
+                      className={`w-full py-3 px-4 rounded-xl font-semibold text-white ${colors.active} ${colors.hover} transition-colors shadow-md`}
+                    >
+                      Quiero una propuesta personalizada
+                    </button>
+                    <button
+                      onClick={() => openForm(`Más información – ${plan.title}`)}
+                      className={`w-full py-3 px-4 rounded-xl font-medium ${colors.text} border-2 ${colors.border} ${colors.hover.replace('bg-', 'hover:bg-').replace('-600', '-50')} transition-colors`}
+                    >
+                      Solo quiero más información
+                    </button>
+                  </div>
+
+                  {/* Commission tiers */}
+                  {plan.commission && (
+                    <div className="border-t-2 border-gray-100 pt-6">
+                      <p className="text-xs font-medium text-gray-600 mb-3">
+                        Tramo de comisión orientativo
+                      </p>
+                      <div className="grid grid-cols-3 gap-2">
+                        {plan.commission.map((c) => (
+                          <div
+                            key={c.label}
+                            className={`rounded-xl ${colors.light} border ${colors.border} border-opacity-30 p-3 text-center`}
+                          >
+                            <div className="text-xs text-gray-600 mb-1">{c.label}</div>
+                            <div className={`text-lg font-bold ${colors.text}`}>
+                              {(c.pct * 100).toFixed(0)}%
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+
+          {/* Extras card */}
+          <div className="relative rounded-2xl bg-white border-2 border-gray-200 hover:border-gray-300 p-8 shadow-sm hover:shadow-xl transition-all">
+            <div className="absolute top-4 right-4">
+              <Sparkles className="w-6 h-6 text-orange-500" />
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">{EXTRA.title}</h3>
+            <p className="text-sm text-gray-600 mb-6">
+              Complementos para acelerar resultados o reforzar branding.
+            </p>
+
+            <div className="space-y-3 mb-6">
+              {EXTRA.items.map((item) => (
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between p-4 rounded-xl bg-gray-50 border border-gray-200"
+                >
+                  <span className="text-sm text-gray-700">{item.name}</span>
+                  <span className="text-base font-semibold text-gray-900">
+                    desde {item.from} €
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <button
+              onClick={() => openForm("Catálogo de servicios adicionales")}
+              className="w-full py-3 px-4 rounded-xl font-medium text-gray-700 border-2 border-gray-300 hover:bg-gray-50 transition-colors"
+            >
+              Solicitar catálogo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Lead form modal */}
+      {showLeadForm && (
+        <LeadForm intent={leadIntent ?? undefined} onClose={() => setShowLeadForm(false)} />
+      )}
+    </div>
+  );
+}
+
+function LeadForm({ intent, onClose }: { intent?: string; onClose: () => void }) {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    budget: "900-2500",
+    situation: ""
+  });
+  const [countries, setCountries] = useState<string[]>([]);
+  const [accept, setAccept] = useState(false);
+
+  const handleSubmit = () => {
+    if (!accept) return;
+    alert("¡Gracias! Te contactaremos si hay encaje con el presupuesto y etapa.");
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black bg-opacity-50 backdrop-blur-sm p-4 overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-2xl bg-white border-2 border-gray-200 p-8 shadow-2xl my-8">
+        <div className="flex items-start justify-between gap-4 mb-6">
+          <div>
+            <h4 className="text-2xl font-bold text-gray-900 mb-2">
+              {intent || "Quiero hablar con Agloob"}
+            </h4>
+            <p className="text-sm text-gray-600">
+              Este formulario nos ayuda a validar encaje y priorizar tu caso. Tiempo de
+              respuesta habitual: 1 día hábil.
+            </p>
+          </div>
+          <button
+            className="rounded-full p-2 hover:bg-gray-100 transition-colors flex-shrink-0"
+            onClick={onClose}
+            aria-label="Cerrar"
+          >
+            <X className="w-5 h-5 text-gray-500" />
+          </button>
+        </div>
+
+        <div className="space-y-5">
+          <div className="grid md:grid-cols-2 gap-4">
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-gray-700">Nombre completo *</span>
+              <input
+                value={formData.name}
+                onChange={(e) => setFormData({...formData, name: e.target.value})}
+                className="rounded-xl bg-white border-2 border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                placeholder="María Gomez"
+              />
+            </label>
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-gray-700">Correo *</span>
+              <input
+                type="email"
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                className="rounded-xl bg-white border-2 border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                placeholder="maria@marca.com"
+              />
+            </label>
+          </div>
+
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-gray-700">Marca / Empresa</span>
+            <input
+              value={formData.company}
+              onChange={(e) => setFormData({...formData, company: e.target.value})}
+              className="rounded-xl bg-white border-2 border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+              placeholder="Nombre de la marca"
+            />
+          </label>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <label className="grid gap-2">
+              <span className="text-sm font-medium text-gray-700">Presupuesto mensual estimado</span>
+              <select
+                value={formData.budget}
+                onChange={(e) => setFormData({...formData, budget: e.target.value})}
+                className="rounded-xl bg-white border-2 border-gray-200 px-4 py-3 text-gray-900 focus:border-blue-500 focus:outline-none transition-colors"
+              >
+                <option value="<900">Menos de 900 €</option>
+                <option value="900-2500">900–2.500 €</option>
+                <option value=">2500">Más de 2.500 €</option>
+              </select>
+            </label>
+            
+            <fieldset className="grid gap-2">
+              <span className="text-sm font-medium text-gray-700">Países objetivo</span>
+              <div className="flex flex-wrap gap-2">
+                {["ES", "FR", "DE", "IT", "UK"].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() =>
+                      setCountries((prev) =>
+                        prev.includes(c) ? prev.filter((x) => x !== c) : [...prev, c]
+                      )
+                    }
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                      countries.includes(c)
+                        ? "bg-blue-500 text-white shadow-md"
+                        : "bg-white border-2 border-gray-200 text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </fieldset>
+          </div>
+
+          <label className="grid gap-2">
+            <span className="text-sm font-medium text-gray-700">Describe tu situación actual</span>
+            <textarea
+              value={formData.situation}
+              onChange={(e) => setFormData({...formData, situation: e.target.value})}
+              className="rounded-xl bg-white border-2 border-gray-200 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors resize-none"
+              rows={4}
+              placeholder="Catálogo, inversión en ads, retos, objetivos a 90 días…"
+            />
+          </label>
+
+          <label className="flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={accept}
+              onChange={() => setAccept(!accept)}
+              className="mt-1 w-4 h-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500 cursor-pointer"
+            />
+            <span className="text-xs text-gray-600">
+              Acepto ser contactad@. Usamos estos datos para evaluar encaje.
+            </span>
+          </label>
+
+          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-t-2 border-gray-100 pt-6">
+            <p className="text-xs text-gray-500 max-w-md">
+              💡 Si tu presupuesto es menor a 900 €, te enviaremos recursos educativos y plantillas gratuitas.
+            </p>
+            <button
+              onClick={handleSubmit}
+              className="px-6 py-3 rounded-xl font-semibold text-white bg-blue-500 hover:bg-blue-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-md whitespace-nowrap"
+              disabled={!accept || !formData.name || !formData.email}
+            >
+              Enviar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
